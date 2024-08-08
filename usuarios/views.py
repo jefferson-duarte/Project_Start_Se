@@ -1,6 +1,7 @@
-from django.contrib import messages
+from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from django.contrib.messages import constants
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 
@@ -45,3 +46,26 @@ def cadastro(request):
         )
 
     return redirect('cadastro:logar')
+
+
+def logar(request):
+    if request.method == 'GET':
+        return render(request, 'logar.html')
+
+    elif request.method == 'POST':
+        username = request.POST.get('username')
+        senha = request.POST.get('senha')
+
+        user = auth.authenticate(request, username=username, password=senha)
+
+        if user:
+            auth.login(request, user)
+            return redirect('empresarios:cadastrar_empresa')
+
+        messages.add_message(
+            request,
+            constants.ERROR,
+            'Usuario ou senha invalidas.'
+        )
+
+        return redirect('usuarios:logar')

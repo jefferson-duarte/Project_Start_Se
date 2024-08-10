@@ -7,6 +7,9 @@ from .models import Empresas
 
 
 def cadastrar_empresa(request):
+    if not request.user.is_authenticated:
+        return redirect('usuarios:logar')
+
     if request.method == 'GET':
         tempo_existencia = Empresas.tempo_existencia_choices
         areas = Empresas.area_choices
@@ -66,3 +69,28 @@ def cadastrar_empresa(request):
             'Empresa cadastrada com sucesso.'
         )
         return redirect('empresarios:cadastrar_empresa')
+
+
+def listar_empresas(request):
+    if not request.user.is_authenticated:
+        return redirect('usuarios:logar')
+
+    if request.method == 'GET':
+        empresas = Empresas.objects.filter(user=request.user)
+
+        context = {
+            'empresas': empresas,
+        }
+
+        return render(request, 'listar_empresas.html', context)
+
+
+def empresa(request, id):
+    empresa = Empresas.objects.get(id=id)
+
+    context = {
+        'empresa': empresa,
+    }
+
+    if request.method == "GET":
+        return render(request, 'empresa.html', context)
